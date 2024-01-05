@@ -11,7 +11,7 @@ Utility to perform ARP-spoofing attack and cut off network for devices in local 
 
 - Download repo from this page or executing:
 ```shell
-git clone 
+git clone https://github.com/RostF1rst/NetCutter.git
 ```
 - Install requirements:
 ```shell
