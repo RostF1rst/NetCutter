@@ -1,19 +1,21 @@
-import platform
 import re
 import time
 import clstr
 from pyfiglet import Figlet
+from var import system, args
 from net_analyzing import get_hosts, get_names
 from netcutter import start_cutting_networks
 
 
 def _is_admin() -> bool:
-    if platform.system().lower() == 'windows':
+    if system == 'windows':
         import ctypes
         return ctypes.windll.shell32.IsUserAnAdmin() != 0
-    else:
+    elif system == 'linux':
         import os
         return os.getuid() == 0
+    else:
+        raise NotImplementedError('This OS is not supported.')
 
 
 def _print_banner() -> None:

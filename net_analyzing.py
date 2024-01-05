@@ -1,13 +1,11 @@
 import multiprocessing
-import platform
 import re
 import socket
 import subprocess
+from var import system
 
 
 def _ping(host):
-    system = platform.system().lower()
-
     try:
         if system == "windows":
             result = subprocess.run(["ping", "-n", "1", host], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -32,16 +30,14 @@ def _pings(j, q) -> None:
 
 
 def _get_self_local_ip() -> str:
-    platform_ = platform.system()
-
-    if platform_ == 'Windows':
+    if system == 'Windows':
         result = subprocess.run(['ipconfig'], capture_output=True, text=True)
         ipconfig_output = result.stdout
 
         match = re.search(r'IPv4 Address\D+(192\.168\.100\.\d{1,3})', ipconfig_output)
         local_ip = match.group(1) if match else None
 
-    elif platform_ == 'Linux':
+    elif system == 'Linux':
         result = subprocess.run(['ifconfig'], capture_output=True, text=True)
         ifconfig_output = result.stdout
 
@@ -49,14 +45,13 @@ def _get_self_local_ip() -> str:
         local_ip = match.group(1) if match else None
 
     else:
-        raise NotImplementedError(f"Платформа {platform_} не поддерживается")
+        raise NotImplementedError(f"Платформа {system} не поддерживается")
 
     return local_ip
 
 
 def _get_name(ip: str) -> str:
     try:
-        print(socket.gethostbyaddr(ip))
         return socket.gethostbyaddr(ip)[0]
     except socket.herror:
         return '[No name]'
